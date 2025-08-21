@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pedido-app.fullname" . }}-backend
+  labels: {{- include "pedido-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backend
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.service.port }}
+          env:
+            - { name: DB_HOST, value: {{ .Values.backend.env.DB_HOST | quote }} }
+            - { name: DB_PORT, value: {{ .Values.backend.env.DB_PORT | quote }} }
+            - { name: DB_NAME, value: {{ .Values.backend.env.DB_NAME | quote }} }
+            - { name: DB_USER, value: {{ .Values.backend.env.DB_USER | quote }} }
+            - { name: DB_PASSWORD, value: {{ .Values.backend.env.DB_PASSWORD | quote }} }
+          readinessProbe:
+            httpGet: { path: "/", port: {{ .Values.backend.service.port }} }
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: "/", port: {{ .Values.backend.service.port }} }
+            initialDelaySeconds: 30

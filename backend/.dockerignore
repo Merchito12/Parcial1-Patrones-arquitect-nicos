@@ -1,0 +1,7 @@
+cat > backend/.dockerignore <<'EOF'
+target
+.gradle
+.git
+*.iml
+*.log
+EOF

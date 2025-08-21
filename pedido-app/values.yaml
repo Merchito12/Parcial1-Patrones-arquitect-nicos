@@ -1,0 +1,21 @@
+frontend:
+  image: { repository: docker.io/merchito12/parcial1-front, tag: "v1", pullPolicy: IfNotPresent }
+  replicas: 1
+  service: { type: ClusterIP, port: 80 }
+
+backend:
+  image: { repository: docker.io/merchito12/parcial1-back, tag: "v1", pullPolicy: IfNotPresent }
+  replicas: 1
+  service: { type: ClusterIP, port: 8080 }
+  env:
+    DB_HOST: "pedido-db-postgresql"   # Service que ya tienes
+    DB_PORT: "5432"
+    DB_NAME: "pedidos"
+    DB_USER: "appuser"
+    DB_PASSWORD: "appsecret"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  host: "pedido.127.0.0.1.nip.io"
+  tls: false
